@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Control sobre tu vida y gastos 📋</title>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>ＰＬＡＮＥＯ</h1>
+    </header>
+
+    <!--notificación mostrada -->
+    <div class="notification" id="notification" style="display:none;"></div>
+
+    <!-- PESTAÑAS (TAREAS,BALANCE,GASTOS) -->
+    <div class="dashboard">
+      <div class="dashboard-card card-tasks">
+        <div class="dashboard-card-content">
+          <h3>Tareas Pendientes</h3>
+          <p id="task-counter">0</p>
+        </div>
+        <div class="dashboard-card-icon">📋</div>
+      </div>
+      <div class="dashboard-card card-balance">
+        <div class="dashboard-card-content">
+          <h3>Balance</h3>
+          <p id="dashboard-balance">S/ 0.00</p>
+        </div>
+        <div class="dashboard-card-icon">💰</div>
+      </div>
+      <div class="dashboard-card card-expenses">
+        <div class="dashboard-card-content">
+          <h3>Gastos del Mes</h3>
+          <p id="dashboard-expenses">S/ 0.00</p>
+        </div>
+        <div class="dashboard-card-icon">📊</div>
+      </div>
+    </div>
+
+    <!-- pestañas interactivas  -->
+    <div class="main-card">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="tasks"><h4>📝 Tareas</h4></button>
+        <button class="tab-button" data-tab="expenses"><h4>💸 Finanza</h4></button>
+      </div>
+
+      <!-- SECCIÓN DE TAREAS -->
+      <div class="tab-content active" id="tasks">
+        <div class="form-section">
+          <h3>Agregar Nueva Tarea</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="task-title">Título</label>
+              <input type="text" id="task-title" class="form-control" placeholder="Escribe tu tarea..." />
+            </div>
+            <div class="form-group">
+              <label for="task-priority">Prioridad</label>
+              <select id="task-priority" class="form-control">
+                <option value="baja">🟢 Baja</option>
+                <option value="media" selected>🟡 Media</option>
+                <option value="alta">🔴 Alta</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="task-date">Fecha Límite</label>
+              <input type="date" id="task-date" class="form-control" />
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" id="add-task">
+            <span class="btn-icon">➕</span> Agregar Tarea
+          </button>
+        </div>
+        <div class="item-list" id="task-list"></div>
+      </div>
+
+      <!-- SECCIOÓN DE GASTOS-->
+      <div class="tab-content" id="expenses">
+        <div class="form-section">
+          <h3>Ingresos Mensuales</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="monthly-income">Monto mensual</label>
+              <input type="number" id="monthly-income" class="form-control" value="0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Agregar Gasto</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="expense-description">Descripción</label>
+              <input type="text" id="expense-description" class="form-control" placeholder="Ej. Supermercado" />
+            </div>
+            <div class="form-group">
+              <label for="expense-amount">Monto</label>
+              <input type="number" id="expense-amount" class="form-control" placeholder="0.00" step="0.01" />
+            </div>
+            <div class="form-group">
+              <label for="expense-category">Categoría</label>
+              <select id="expense-category" class="form-control">
+                <option value="comida">🍽 Comida</option>
+                <option value="transporte">🚗 Transporte</option>
+                <option value="hogar">🏠 Hogar</option>
+                <option value="entretenimiento">🎬 Entretenimiento</option>
+                <option value="salud">⚕ Salud</option>
+                <option value="otros">📦 Otros</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn btn-danger" id="add-expense">
+            <span class="btn-icon">➕</span> Agregar Gasto
+          </button>
+        </div>
+        <div class="item-list" id="expense-list"></div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

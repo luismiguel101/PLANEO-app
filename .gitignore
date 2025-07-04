@@ -1,0 +1,29 @@
+# === BACKEND ===
+backend/node_modules/
+backend/.env
+backend/.DS_Store
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+
+# === FRONTEND ===
+frontend/node_modules/
+frontend/.DS_Store
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# === SISTEMA OPERATIVO / EDITORES ===
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# === ARCHIVOS DE TEST / DATOS TEMPORALES ===
+*.test.js
+*.spec.js
+*.log
+
+# === ENV VARIABLES A NIVEL GLOBAL ===
+.env
