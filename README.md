@@ -34,10 +34,10 @@ Diseñada con un estilo **futurista**, colores sobrios y enfoque móvil 📱, es
 ## 🖼️ Vistas de la aplicación
 
 ### 📱 Pantalla de inicio de sesión
-![Login](img/inicio-de-sesión.png)
+![Login]("img/inicio-de-sesión.png")
 
 ### 📋 Panel de tareas activas
-![Tareas](."img/tasks.png)
+![Tareas](."img/tasks.png")
 
 ### 💵 Panel de finanzas con balance
-![Finanzas]("img/expenses.png)
+![Finanzas]("img/expenses.png")
