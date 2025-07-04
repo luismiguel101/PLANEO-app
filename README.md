@@ -29,5 +29,7 @@
 - Uso de **JSON Web Tokens (JWT)** para proteger rutas y datos de usuario.
 ---
 
-### VISTAS DE LA img/expenses.pngAPP
-- ![Task](img/expenses.png)
+### VISTAS DE LA APP
+- ![Login](img/inicio-de-sesión.png)
+- ![Task](img/tasks.png)
+- ![Gastos](img/expenses.png)
