@@ -1,5 +1,6 @@
-const API = 'http://127.0.0.1:5000/api/tasks';
-const EXPENSE_API = 'http://127.0.0.1:5000/api/expenses';
+const API = 'https://planeo-app-2.onrender.com/api/tasks';
+const EXPENSE_API = 'https://planeo-app-2.onrender.com/api/expenses';
+
 
 document.addEventListener('DOMContentLoaded', function () {
   const titleInput = document.getElementById('task-title');
