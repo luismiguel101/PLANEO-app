@@ -1,15 +1,26 @@
-const API = 'http://127.0.0.1:5000/api/auth';
+const AUTH_API = 'https://planeo-x4hm.onrender.com/api/auth'; 
 
-// Cambiar pestañas
+// pestañas de login/registro
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    
+
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
+
+// Función para mostrar la app después de login o registro
+function mostrarApp() {
+  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('app-section').style.display = 'block';
+  document.body.classList.remove('auth-mode');
+
+  // Cargar datos si están definidas las funciones en app.js
+  if (typeof loadTasks === 'function') loadTasks();
+  if (typeof loadExpenses === 'function') loadExpenses();
+}
 
 // Login
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -17,8 +28,13 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
 
+  if (!email || !password) {
+    alert('Por favor, completa todos los campos');
+    return;
+  }
+
   try {
-    const res = await fetch(`${API}/login`, {
+    const res = await fetch(`${AUTH_API}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -29,23 +45,25 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
     localStorage.setItem('token', data.token);
-    window.location.href = 'index.html'; // Cambia a tu archivo principal
+    mostrarApp();
   } catch (err) {
     alert('❌ ' + err.message);
   }
 });
 
+
 // Registro
 document.getElementById('register-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const username = document.getElementById('register-username').value.trim();
   const email = document.getElementById('register-email').value.trim();
   const password = document.getElementById('register-password').value;
 
   try {
-    const res = await fetch(`${API}/register`, {
+    const res = await fetch(`${AUTH_API}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ username, email, password })
     });
 
     const data = await res.json();
@@ -53,8 +71,9 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     if (!res.ok) throw new Error(data.message || 'Error al registrarse');
 
     localStorage.setItem('token', data.token);
-    window.location.href = 'index.html';
+    mostrarApp();
   } catch (err) {
     alert('❌ ' + err.message);
   }
 });
+

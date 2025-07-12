@@ -1,31 +1,20 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // Registro de usuario
 const registerUser = async (req, res) => {
-  const { email, password } = req.body;
-  
+  const { username, email, password } = req.body;
+
   try {
-    // Verificar si el usuario ya existe
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: '❌ El usuario ya existe' });
     }
 
-    // Crear un nuevo usuario
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    user = new User({ email, password: hashedPassword });
-
-    // Guardar el usuario en la base de datos
+    user = new User({ username, email, password });
     await user.save();
 
-    // Crear el token JWT
-    const payload = {
-      userId: user._id,
-    };
-
+    const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(201).json({ token });
@@ -40,22 +29,18 @@ const loginUser = async (req, res) => {
 
   try {
     // Verificar si el usuario existe
-    let user = await User.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: '❌ Usuario o contraseña incorrectos' });
     }
 
-    // Comparar la contraseña
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Usar el método del modelo para comparar contraseñas
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: '❌ Usuario o contraseña incorrectos' });
     }
 
-    // Crear el token JWT
-    const payload = {
-      userId: user._id,
-    };
-
+    const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ token });
