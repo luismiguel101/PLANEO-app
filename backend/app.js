@@ -6,6 +6,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {   //DEBUGGING TEMPORAL
+  console.log(`📨 ${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log('Body:', req.body);
+  next();
+});
+
 // Rutas
 const taskRoutes = require('./routes/tasks');
 const expenseRoutes = require('./routes/expenses');

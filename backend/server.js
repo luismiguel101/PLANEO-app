@@ -6,6 +6,13 @@ const app = require('./app');
 
 const PORT = process.env.PORT || 5000;
 
+// 🔍 DEBUGGING TEMPORAL - Verificar variables de entorno
+console.log('🔍 Variables de entorno:');
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? '✅ Configurada' : '❌ No configurada');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Configurada' : '❌ No configurada');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+
 console.log('🧠 Iniciando servidor...');
 
 const startServer = async () => {
