@@ -2,6 +2,28 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
+// Configuración de CORS para desarrollo y producción
+const corsOptions = {
+  origin: [
+    // Producción - Vercel
+    'https://planeo-app.vercel.app',
+    
+    // Desarrollo local - Live Server
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://127.0.0.1:5501',
+    'http://localhost:5501',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
