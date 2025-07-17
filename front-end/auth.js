@@ -6,24 +6,22 @@ function mostrarApp() {
   document.getElementById('app-section').style.display = 'block';
   document.body.classList.remove('auth-mode');
 
-  // Cargar tareas y gastos solo si las funciones existen
-  if (typeof loadTasks === 'function') loadTasks();
-  if (typeof loadExpenses === 'function') loadExpenses();
+  // Cargar tareas y gastos después de un pequeño delay para asegurar DOM activo
+  setTimeout(() => {
+    if (typeof loadTasks === 'function') loadTasks();
+    if (typeof loadExpenses === 'function') loadExpenses();
+  }, 100); // puedes ajustar si es necesario
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Verificar si ya hay token => usuario autenticado
   const token = localStorage.getItem('token');
-  if (token) {
-    mostrarApp(); 
-  }
+  if (token) mostrarApp();
 
-  // pestañas de login/registro
+  // pestañas de login / registro
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab).classList.add('active');
     });
@@ -48,12 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
       localStorage.setItem('token', data.token);
-
-      mostrarApp(); // ✅ Llama a mostrarApp tras iniciar sesión
+      mostrarApp(); // ✅ carga app tras login
 
     } catch (err) {
       alert('❌ ' + err.message);
@@ -80,18 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || 'Error al registrarse');
 
       localStorage.setItem('token', data.token);
-
-      mostrarApp(); // ✅ Mostrar la app directamente tras registro
+      mostrarApp(); // ✅ carga app tras registro
 
     } catch (err) {
       alert('❌ ' + err.message);
     }
   });
 });
+
 
 
 

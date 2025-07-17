@@ -1,34 +1,25 @@
-
 const API = 'https://planeo-x4hm.onrender.com/api/tasks';
 const EXPENSE_API = 'https://planeo-x4hm.onrender.com/api/expenses';
 
-// === Protección anticipada: evitar que se vea el dashboard sin token ===
 const token = localStorage.getItem('token');
 
-// Redirige visualmente según estado de autenticación incluso antes del DOMContentLoaded
 if (!token) {
   document.addEventListener('DOMContentLoaded', () => {
-    const authSection = document.getElementById('auth-section');
-    const appSection = document.getElementById('app-section');
-    authSection.style.display = 'block';
-    appSection.style.display = 'none';
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('app-section').style.display = 'none';
     document.body.classList.add('auth-mode');
   });
 } else {
   document.addEventListener('DOMContentLoaded', () => {
-    const authSection = document.getElementById('auth-section');
-    const appSection = document.getElementById('app-section');
-    authSection.style.display = 'none';
-    appSection.style.display = 'block';
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('app-section').style.display = 'block';
     document.body.classList.remove('auth-mode');
 
-    // === HEADERS PARA AUTORIZACIÓN JWT ===
     const authHeaders = {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + token
     };
 
-    // === BOTÓN DE CERRAR SESIÓN ===
     const logoutBtn = document.getElementById('logout-btn');
     const logoutTab = document.getElementById('logout-tab');
     const logoutDropdown = document.getElementById('logout-dropdown');
@@ -38,7 +29,6 @@ if (!token) {
         logoutDropdown.classList.toggle('hidden');
       });
 
-      // Opcional: cerrar el dropdown si haces clic fuera
       document.addEventListener('click', (e) => {
         if (!logoutTab.contains(e.target) && !logoutDropdown.contains(e.target)) {
           logoutDropdown.classList.add('hidden');
@@ -49,17 +39,18 @@ if (!token) {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
-        window.location.reload(); // Recarga para mostrar login
+        window.location.reload();
       });
     }
 
-    // === ELEMENTOS DE LA APP ===
+    // === ELEMENTOS DOM ===
     const titleInput = document.getElementById('task-title');
     const priorityInput = document.getElementById('task-priority');
     const addTaskBtn = document.getElementById('add-task');
     const taskListContainer = document.getElementById('task-list');
     const taskCounter = document.getElementById('task-counter');
     const notification = document.getElementById('notification');
+
     const expenseDesc = document.getElementById('expense-description');
     const expenseAmount = document.getElementById('expense-amount');
     const expenseCategory = document.getElementById('expense-category');
@@ -67,10 +58,10 @@ if (!token) {
     const expenseList = document.getElementById('expense-list');
     const incomeInput = document.getElementById('monthly-income');
     const balanceDisplay = document.getElementById('dashboard-balance');
+
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // === PESTAÑAS ===
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -81,7 +72,7 @@ if (!token) {
       });
     });
 
-    // === CARGAR TAREAS ===
+    // === FUNCIONES ===
     async function loadTasks() {
       try {
         const res = await fetch(API, { headers: authHeaders });
@@ -134,53 +125,6 @@ if (!token) {
       notification.innerHTML = `🔔 Tienes <strong>${total}</strong> tareas pendientes (${highPriority} de alta prioridad)`;
     }
 
-    // === AGREGAR TAREA ===
-    addTaskBtn.addEventListener('click', async () => {
-      const title = titleInput.value.trim();
-      const priority = priorityInput.value;
-      if (!title) return alert('El título es obligatorio');
-
-      try {
-        await fetch(API, {
-          method: 'POST',
-          headers: authHeaders,
-          body: JSON.stringify({ title, priority })
-        });
-        titleInput.value = '';
-        priorityInput.value = 'media';
-        await loadTasks();
-      } catch (err) {
-        console.error('❌ Error al agregar tarea:', err);
-      }
-    });
-
-    taskListContainer.addEventListener('click', async (e) => {
-      const id = e.target.dataset.id;
-      if (!id) return;
-
-      try {
-        if (e.target.classList.contains('btn-delete')) {
-          await fetch(`${API}/${id}`, {
-            method: 'DELETE',
-            headers: authHeaders
-          });
-        } else if (e.target.classList.contains('item-checkbox')) {
-          const res = await fetch(API, { headers: authHeaders });
-          const tasks = await res.json();
-          const task = tasks.find(t => t._id === id);
-          await fetch(`${API}/${id}`, {
-            method: 'PUT',
-            headers: authHeaders,
-            body: JSON.stringify({ completed: !task.completed })
-          });
-        }
-        await loadTasks();
-      } catch (err) {
-        console.error('❌ Error al modificar tarea:', err);
-      }
-    });
-
-    // === CARGAR GASTOS ===
     async function loadExpenses() {
       try {
         const res = await fetch(EXPENSE_API, { headers: authHeaders });
@@ -226,14 +170,50 @@ if (!token) {
       balanceDisplay.textContent = `S/ ${balance.toFixed(2)}`;
     }
 
+    // === EVENTOS ===
+    addTaskBtn.addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      const priority = priorityInput.value;
+      if (!title) return alert('El título es obligatorio');
 
-    // Al iniciar, recuperar valor guardado del monto balance
-    incomeInput.value = localStorage.getItem('income') || '';
+      try {
+        await fetch(API, {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ title, priority })
+        });
+        titleInput.value = '';
+        priorityInput.value = 'media';
+        await loadTasks();
+      } catch (err) {
+        console.error('❌ Error al agregar tarea:', err);
+      }
+    });
 
-    // Al modificar ingreso, guardar y actualizar balance
-    incomeInput.addEventListener('input', () => {
-      localStorage.setItem('income', incomeInput.value);
-      loadExpenses(); // actualiza el balance
+    taskListContainer.addEventListener('click', async (e) => {
+      const id = e.target.dataset.id;
+      if (!id) return;
+
+      try {
+        if (e.target.classList.contains('btn-delete')) {
+          await fetch(`${API}/${id}`, {
+            method: 'DELETE',
+            headers: authHeaders
+          });
+        } else if (e.target.classList.contains('item-checkbox')) {
+          const res = await fetch(API, { headers: authHeaders });
+          const tasks = await res.json();
+          const task = tasks.find(t => t._id === id);
+          await fetch(`${API}/${id}`, {
+            method: 'PUT',
+            headers: authHeaders,
+            body: JSON.stringify({ completed: !task.completed })
+          });
+        }
+        await loadTasks();
+      } catch (err) {
+        console.error('❌ Error al modificar tarea:', err);
+      }
     });
 
     addExpenseBtn.addEventListener('click', async () => {
@@ -276,13 +256,33 @@ if (!token) {
       }
     });
 
-    incomeInput.addEventListener('input', () => loadExpenses());
+    incomeInput.value = localStorage.getItem('income') || '';
 
-    // === INICIO ===
-    loadTasks();
-    loadExpenses();
+    incomeInput.addEventListener('input', () => {
+      localStorage.setItem('income', incomeInput.value);
+      updateBalanceDisplayFromInput(); // evita doble fetch
+    });
 
+    function updateBalanceDisplayFromInput() {
+      const current = document.getElementById('dashboard-expenses').textContent.replace('S/ ', '');
+      updateBalanceDisplay(parseFloat(current));
+    }
+
+    // === EXPORTA FUNCIONES PARA AUTH.JS ===
     window.loadTasks = loadTasks;
     window.loadExpenses = loadExpenses;
+
+    // === INICIALIZA DESPUÉS DE IDLE ===
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        loadTasks();
+        loadExpenses();
+      });
+    } else {
+      setTimeout(() => {
+        loadTasks();
+        loadExpenses();
+      }, 100);
+    }
   });
 }
