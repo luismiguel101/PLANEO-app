@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest.json" href="/manifest.json" />
   <meta name="theme-color" content="#ff6600" />
-  
+
   <style>
     #auth-section {
       display: none;
@@ -157,7 +157,13 @@
   <div class="container" id="app-section">
     <header class="header">
       <h1>ＰＬＡＮＥＯ</h1>
-      <button id="logout-btn">Cerrar sesión</button>
+      <div class="logout-menu">
+        <button id="logout-tab">☰</button>
+        <div id="logout-dropdown" class="hidden">
+          <button id="logout-btn">Cerrar sesión</button>
+        </div>
+      </div>
+
     </header>
 
     <div class="notification" id="notification" style="display:none;"></div>

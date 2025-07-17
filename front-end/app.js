@@ -29,6 +29,22 @@ if (!token) {
 
     // === BOTÓN DE CERRAR SESIÓN ===
     const logoutBtn = document.getElementById('logout-btn');
+    const logoutTab = document.getElementById('logout-tab');
+    const logoutDropdown = document.getElementById('logout-dropdown');
+
+    if (logoutTab && logoutDropdown) {
+  logoutTab.addEventListener('click', () => {
+    logoutDropdown.classList.toggle('hidden');
+  });
+
+  // Opcional: cerrar el dropdown si haces clic fuera
+  document.addEventListener('click', (e) => {
+    if (!logoutTab.contains(e.target) && !logoutDropdown.contains(e.target)) {
+      logoutDropdown.classList.add('hidden');
+    }
+  });
+}
+
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
