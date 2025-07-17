@@ -3,7 +3,7 @@ const Expense = require('../models/expense');
 // Obtener gastos del usuario autenticado
 const getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find({ user: req.userId }).sort({ createdAt: -1 });
+    const expenses = await Expense.find({ user: req.user }).sort({ createdAt: -1 });
     res.json(expenses);
   } catch (error) {
     res.status(500).json({ message: '❌ Error al obtener los gastos', error: error.message });
@@ -18,7 +18,7 @@ const createExpense = async (req, res) => {
       description,
       amount,
       category,
-      user: req.userId
+      user: req.user
     });
     await newExpense.save();
     res.status(201).json(newExpense);
@@ -31,7 +31,7 @@ const createExpense = async (req, res) => {
 const deleteExpense = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedExpense = await Expense.findOneAndDelete({ _id: id, user: req.userId });
+    const deletedExpense = await Expense.findOneAndDelete({ _id: id, user: req.user });
     if (!deletedExpense) {
       return res.status(404).json({ message: '❌ Gasto no encontrado' });
     }
