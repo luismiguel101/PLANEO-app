@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Verificar si ya hay token => usuario autenticado
   const token = localStorage.getItem('token');
   if (token) {
-    mostrarApp(); // Se ejecuta cuando el DOM ya está cargado
+    mostrarApp(); 
   }
 
   // pestañas de login/registro

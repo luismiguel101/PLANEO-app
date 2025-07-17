@@ -1,3 +1,4 @@
+
 const API = 'https://planeo-x4hm.onrender.com/api/tasks';
 const EXPENSE_API = 'https://planeo-x4hm.onrender.com/api/expenses';
 
@@ -280,6 +281,8 @@ if (!token) {
     // === INICIO ===
     loadTasks();
     loadExpenses();
+
+    window.loadTasks = loadTasks;
+    window.loadExpenses = loadExpenses;
   });
 }
-
