@@ -3,7 +3,7 @@ const Task = require('../models/Task');
 // Obtener tareas del usuario autenticado
 const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ user: req.userId }).sort({ createdAt: -1 });
+    const tasks = await Task.find({ user: req.user }).sort({ createdAt: -1 });
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ message: '❌ Error al obtener las tareas', error: error.message });
@@ -18,6 +18,7 @@ const createTask = async (req, res) => {
       title,
       description,
       priority,
+      completed: false,
       user: req.user
     });
     await newTask.save();
@@ -32,7 +33,7 @@ const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedTask = await Task.findOneAndUpdate(
-      { _id: id, user: req.userId },
+      { _id: id, user: req.user },
       req.body,
       { new: true }
     );
@@ -49,7 +50,7 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedTask = await Task.findOneAndDelete({ _id: id, user: req.userId });
+    const deletedTask = await Task.findOneAndDelete({ _id: id, user: req.user });
     if (!deletedTask) {
       return res.status(404).json({ message: '❌ Tarea no encontrada' });
     }

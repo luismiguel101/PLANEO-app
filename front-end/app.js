@@ -33,17 +33,17 @@ if (!token) {
     const logoutDropdown = document.getElementById('logout-dropdown');
 
     if (logoutTab && logoutDropdown) {
-  logoutTab.addEventListener('click', () => {
-    logoutDropdown.classList.toggle('hidden');
-  });
+      logoutTab.addEventListener('click', () => {
+        logoutDropdown.classList.toggle('hidden');
+      });
 
-  // Opcional: cerrar el dropdown si haces clic fuera
-  document.addEventListener('click', (e) => {
-    if (!logoutTab.contains(e.target) && !logoutDropdown.contains(e.target)) {
-      logoutDropdown.classList.add('hidden');
+      // Opcional: cerrar el dropdown si haces clic fuera
+      document.addEventListener('click', (e) => {
+        if (!logoutTab.contains(e.target) && !logoutDropdown.contains(e.target)) {
+          logoutDropdown.classList.add('hidden');
+        }
+      });
     }
-  });
-}
 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
@@ -224,6 +224,16 @@ if (!token) {
       const balance = income - totalExpenses;
       balanceDisplay.textContent = `S/ ${balance.toFixed(2)}`;
     }
+
+
+    // Al iniciar, recuperar valor guardado del monto balance
+    incomeInput.value = localStorage.getItem('income') || '';
+
+    // Al modificar ingreso, guardar y actualizar balance
+    incomeInput.addEventListener('input', () => {
+      localStorage.setItem('income', incomeInput.value);
+      loadExpenses(); // actualiza el balance
+    });
 
     addExpenseBtn.addEventListener('click', async () => {
       const description = expenseDesc.value.trim();
