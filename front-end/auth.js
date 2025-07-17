@@ -1,4 +1,4 @@
-const AUTH_API = 'https://planeo-x4hm.onrender.com/api/auth'; 
+const AUTH_API = 'https://planeo-x4hm.onrender.com/api/auth';
 
 // pestañas de login/registro
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -11,15 +11,17 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Función para mostrar la app después de login o registro
+// Mostrar sección principal de la app
 function mostrarApp() {
   document.getElementById('auth-section').style.display = 'none';
   document.getElementById('app-section').style.display = 'block';
   document.body.classList.remove('auth-mode');
 
-  // Cargar datos si están definidas las funciones en app.js
-  if (typeof loadTasks === 'function') loadTasks();
-  if (typeof loadExpenses === 'function') loadExpenses();
+  // Espera un breve momento para asegurar que app.js esté cargado
+  setTimeout(() => {
+    if (typeof loadTasks === 'function') loadTasks();
+    if (typeof loadExpenses === 'function') loadExpenses();
+  }, 100); // Espera 100ms (ajustable si fuera necesario)
 }
 
 // Login
@@ -45,12 +47,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
     localStorage.setItem('token', data.token);
+
+    // ✅ Llama a mostrarApp después de guardar el token
     mostrarApp();
+
   } catch (err) {
     alert('❌ ' + err.message);
   }
 });
-
 
 // Registro
 document.getElementById('register-form').addEventListener('submit', async (e) => {
@@ -58,6 +62,11 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
   const username = document.getElementById('register-username').value.trim();
   const email = document.getElementById('register-email').value.trim();
   const password = document.getElementById('register-password').value;
+
+  if (!username || !email || !password) {
+    alert('Por favor, completa todos los campos');
+    return;
+  }
 
   try {
     const res = await fetch(`${AUTH_API}/register`, {
@@ -71,9 +80,13 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     if (!res.ok) throw new Error(data.message || 'Error al registrarse');
 
     localStorage.setItem('token', data.token);
+
+    // ✅ Mostrar la app directamente tras registro
     mostrarApp();
+
   } catch (err) {
     alert('❌ ' + err.message);
   }
 });
+
 
