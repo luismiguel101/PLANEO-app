@@ -5,12 +5,9 @@ function mostrarApp() {
   document.getElementById('auth-section').style.display = 'none';
   document.getElementById('app-section').style.display = 'block';
   document.body.classList.remove('auth-mode');
-
-  // Cargar tareas y gastos después de un pequeño delay para asegurar DOM activo
-  setTimeout(() => {
-    if (typeof loadTasks === 'function') loadTasks();
-    if (typeof loadExpenses === 'function') loadExpenses();
-  }, 100); // puedes ajustar si es necesario
+  
+// ✅ Recarga para forzar que app.js se inicie con el token presente
+  window.location.reload();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
