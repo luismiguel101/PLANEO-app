@@ -11,8 +11,13 @@ if (!token) {
   });
 } else {
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('app-section').style.display = 'block';
+    const authSection = document.getElementById('auth-section');
+    const appSection = document.getElementById('app-section');
+    const loader = document.getElementById('loader');
+
+    authSection.style.display = 'none';
+    appSection.style.display = 'none'; // ocultamos hasta que termine de cargar
+    loader.style.display = 'flex'; // mostramos loader
     document.body.classList.remove('auth-mode');
 
     const authHeaders = {
@@ -43,7 +48,7 @@ if (!token) {
       });
     }
 
-    // === ELEMENTOS DOM ===
+    // === DOM Elements ===
     const titleInput = document.getElementById('task-title');
     const priorityInput = document.getElementById('task-priority');
     const addTaskBtn = document.getElementById('add-task');
@@ -72,7 +77,21 @@ if (!token) {
       });
     });
 
-    // === FUNCIONES ===
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    };
+
+    function showLoader() {
+      loader.style.display = 'flex';
+      appSection.style.display = 'none';
+    }
+
+    function hideLoader() {
+      loader.style.display = 'none';
+      appSection.style.display = 'block';
+    }
+
     async function loadTasks() {
       try {
         const res = await fetch(API, { headers: authHeaders });
@@ -120,7 +139,7 @@ if (!token) {
     }
 
     function showNotification(total, highPriority) {
-      if (total === 0) return notification.style.display = 'none';
+      if (total === 0) return (notification.style.display = 'none');
       notification.style.display = 'block';
       notification.innerHTML = `🔔 Tienes <strong>${total}</strong> tareas pendientes (${highPriority} de alta prioridad)`;
     }
@@ -170,7 +189,14 @@ if (!token) {
       balanceDisplay.textContent = `S/ ${balance.toFixed(2)}`;
     }
 
-    // === EVENTOS ===
+    function updateBalanceDisplayFromInput() {
+      const current = parseFloat(
+        document.getElementById('dashboard-expenses').textContent.replace('S/ ', '')
+      );
+      updateBalanceDisplay(current);
+    }
+
+    // === Eventos ===
     addTaskBtn.addEventListener('click', async () => {
       const title = titleInput.value.trim();
       const priority = priorityInput.value;
@@ -196,10 +222,7 @@ if (!token) {
 
       try {
         if (e.target.classList.contains('btn-delete')) {
-          await fetch(`${API}/${id}`, {
-            method: 'DELETE',
-            headers: authHeaders
-          });
+          await fetch(`${API}/${id}`, { method: 'DELETE', headers: authHeaders });
         } else if (e.target.classList.contains('item-checkbox')) {
           const res = await fetch(API, { headers: authHeaders });
           const tasks = await res.json();
@@ -231,7 +254,6 @@ if (!token) {
           headers: authHeaders,
           body: JSON.stringify({ description, amount, category })
         });
-
         expenseDesc.value = '';
         expenseAmount.value = '';
         expenseCategory.value = 'otros';
@@ -257,32 +279,28 @@ if (!token) {
     });
 
     incomeInput.value = localStorage.getItem('income') || '';
-
     incomeInput.addEventListener('input', () => {
       localStorage.setItem('income', incomeInput.value);
-      updateBalanceDisplayFromInput(); // evita doble fetch
+      updateBalanceDisplayFromInput();
     });
 
-    function updateBalanceDisplayFromInput() {
-      const current = document.getElementById('dashboard-expenses').textContent.replace('S/ ', '');
-      updateBalanceDisplay(parseFloat(current));
-    }
-
-    // === EXPORTA FUNCIONES PARA AUTH.JS ===
+    // === Exportar para auth.js ===
     window.loadTasks = loadTasks;
     window.loadExpenses = loadExpenses;
 
-    // === INICIALIZA DESPUÉS DE IDLE ===
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        loadTasks();
-        loadExpenses();
-      });
-    } else {
-      setTimeout(() => {
-        loadTasks();
-        loadExpenses();
-      }, 100);
+    // === INIT ===
+    async function initApp() {
+      showLoader();
+      try {
+        await Promise.all([loadTasks(), loadExpenses()]);
+      } catch (e) {
+        console.error('❌ Error inicializando app:', e);
+      } finally {
+        hideLoader();
+      }
     }
+
+    // Ejecutar la app después del DOM y login
+    initApp();
   });
 }

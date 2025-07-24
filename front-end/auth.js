@@ -5,9 +5,7 @@ function mostrarApp() {
   document.getElementById('auth-section').style.display = 'none';
   document.getElementById('app-section').style.display = 'block';
   document.body.classList.remove('auth-mode');
-  
-// ✅ Recarga para forzar que app.js se inicie con el token presente
-  window.location.reload();
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error(data.message || 'Error al registrarse');
 
       localStorage.setItem('token', data.token);
-      mostrarApp(); // ✅ carga app tras registro
+      window.location.reload();
+      //mostrarApp(); // ✅ carga app tras registro
 
     } catch (err) {
       alert('❌ ' + err.message);
