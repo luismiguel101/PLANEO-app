@@ -1,16 +1,36 @@
+
+
 const AUTH_API = 'https://planeo-x4hm.onrender.com/api/auth';
 
-// Mostrar sección principal de la app
+// Mostrar sección principal de la app con loader
 function mostrarApp() {
-  document.getElementById('auth-section').style.display = 'none';
-  document.getElementById('app-section').style.display = 'block';
+  const authSection = document.getElementById('auth-section');
+  const appSection = document.getElementById('app-section');
+  const loader = document.getElementById('loader');
+
+  // Ocultar auth y mostrar loader
+  authSection.style.display = 'none';
+  loader.style.display = 'flex';
+  appSection.style.display = 'none';
   document.body.classList.remove('auth-mode');
 
+  // Inicializar la app después de mostrar el loader
+  setTimeout(() => {
+    if (window.initDashboard && typeof window.initDashboard === 'function') {
+      window.initDashboard();
+    }
+  }, 100);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('token');
-  if (token) mostrarApp();
+  
+  // Si ya hay token, no mostrar loader aún, se manejará en app.js
+  if (token) {
+    document.getElementById('auth-section').style.display = 'none';
+    document.body.classList.remove('auth-mode');
+    return;
+  }
 
   // pestañas de login / registro
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -44,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
       localStorage.setItem('token', data.token);
-      mostrarApp(); // ✅ carga app tras login
+      mostrarApp(); // ✅ Muestra loader y carga datos
 
     } catch (err) {
       alert('❌ ' + err.message);
@@ -74,15 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error(data.message || 'Error al registrarse');
 
       localStorage.setItem('token', data.token);
-      window.location.reload();
-      //mostrarApp(); // ✅ carga app tras registro
+      mostrarApp(); // ✅ Muestra loader y carga datos
 
     } catch (err) {
       alert('❌ ' + err.message);
     }
   });
 });
-
-
-
-

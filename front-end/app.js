@@ -15,9 +15,10 @@ if (!token) {
     const appSection = document.getElementById('app-section');
     const loader = document.getElementById('loader');
 
+    // Si viene de refresh y ya tiene token, mostrar app sin loader
     authSection.style.display = 'none';
-    appSection.style.display = 'none'; // ocultamos hasta que termine de cargar
-    loader.style.display = 'flex'; // mostramos loader
+    appSection.style.display = 'block';
+    loader.style.display = 'none';
     document.body.classList.remove('auth-mode');
 
     const authHeaders = {
@@ -44,11 +45,11 @@ if (!token) {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('income'); // Limpiar income también
         window.location.reload();
       });
     }
 
-    // === DOM Elements ===
     const titleInput = document.getElementById('task-title');
     const priorityInput = document.getElementById('task-priority');
     const addTaskBtn = document.getElementById('add-task');
@@ -76,11 +77,6 @@ if (!token) {
         document.getElementById(tabId).classList.add('active');
       });
     });
-
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    };
 
     function showLoader() {
       loader.style.display = 'flex';
@@ -133,6 +129,7 @@ if (!token) {
         console.error('❌ Error al cargar tareas:', err);
         if (err.message.includes('Token')) {
           localStorage.removeItem('token');
+          localStorage.removeItem('income');
           window.location.reload();
         }
       }
@@ -178,6 +175,7 @@ if (!token) {
         console.error('❌ Error al cargar gastos:', err);
         if (err.message.includes('Token')) {
           localStorage.removeItem('token');
+          localStorage.removeItem('income');
           window.location.reload();
         }
       }
@@ -187,6 +185,13 @@ if (!token) {
       const income = parseFloat(incomeInput.value) || 0;
       const balance = income - totalExpenses;
       balanceDisplay.textContent = `S/ ${balance.toFixed(2)}`;
+      
+      // Cambiar color del balance según si es positivo o negativo
+      if (balance < 0) {
+        balanceDisplay.style.color = '#ef4444';
+      } else {
+        balanceDisplay.style.color = '#10b981';
+      }
     }
 
     function updateBalanceDisplayFromInput() {
@@ -196,7 +201,6 @@ if (!token) {
       updateBalanceDisplay(current);
     }
 
-    // === Eventos ===
     addTaskBtn.addEventListener('click', async () => {
       const title = titleInput.value.trim();
       const priority = priorityInput.value;
@@ -278,29 +282,37 @@ if (!token) {
       }
     });
 
+    // Cargar income guardado y configurar listener
     incomeInput.value = localStorage.getItem('income') || '';
     incomeInput.addEventListener('input', () => {
       localStorage.setItem('income', incomeInput.value);
       updateBalanceDisplayFromInput();
     });
 
-    // === Exportar para auth.js ===
-    window.loadTasks = loadTasks;
-    window.loadExpenses = loadExpenses;
+    // Función expuesta globalmente para ser llamada desde auth.js
+    window.initDashboard = async function() {
+      try {
+        showLoader();
+        await Promise.all([loadTasks(), loadExpenses()]);
+        hideLoader();
+      } catch (error) {
+        console.error('❌ Error al cargar datos del usuario:', error);
+        hideLoader();
+        alert('Error al cargar los datos. Por favor, recarga la página.');
+      }
+    };
 
-    // === INIT ===
-    async function initApp() {
-      showLoader();
+    // Cargar datos iniciales solo si viene de refresh (no de login/register)
+    async function initDashboard() {
       try {
         await Promise.all([loadTasks(), loadExpenses()]);
-      } catch (e) {
-        console.error('❌ Error inicializando app:', e);
-      } finally {
-        hideLoader();
+      } catch (error) {
+        console.error('❌ Error al cargar datos del usuario:', error);
+        alert('Error al cargar los datos. Por favor, recarga la página.');
       }
     }
 
-    // Ejecutar la app después del DOM y login
-    initApp();
+    // Solo cargar datos si viene de refresh
+    initDashboard();
   });
 }
