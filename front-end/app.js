@@ -3,6 +3,38 @@ const EXPENSE_API = 'https://planeo-x4hm.onrender.com/api/expenses';
 
 const token = localStorage.getItem('token');
 
+// Función para obtener el ID del usuario desde el token
+function getUserIdFromToken(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId || payload.id || payload.sub;
+  } catch (error) {
+    console.error('Error decodificando token:', error);
+    return null;
+  }
+}
+
+// Funciones para manejar income por usuario
+function getUserIncomeKey() {
+  const userId = getUserIdFromToken(token);
+  return userId ? `income_${userId}` : 'income';
+}
+
+function getUserIncome() {
+  const key = getUserIncomeKey();
+  return localStorage.getItem(key) || '';
+}
+
+function setUserIncome(value) {
+  const key = getUserIncomeKey();
+  localStorage.setItem(key, value);
+}
+
+function clearUserIncome() {
+  const key = getUserIncomeKey();
+  localStorage.removeItem(key);
+}
+
 if (!token) {
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('auth-section').style.display = 'block';
@@ -45,7 +77,7 @@ if (!token) {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('income'); // Limpiar income también
+        clearUserIncome(); // Limpiar income del usuario actual
         window.location.reload();
       });
     }
@@ -129,7 +161,7 @@ if (!token) {
         console.error('❌ Error al cargar tareas:', err);
         if (err.message.includes('Token')) {
           localStorage.removeItem('token');
-          localStorage.removeItem('income');
+          clearUserIncome();
           window.location.reload();
         }
       }
@@ -175,7 +207,7 @@ if (!token) {
         console.error('❌ Error al cargar gastos:', err);
         if (err.message.includes('Token')) {
           localStorage.removeItem('token');
-          localStorage.removeItem('income');
+          clearUserIncome();
           window.location.reload();
         }
       }
@@ -282,10 +314,10 @@ if (!token) {
       }
     });
 
-    // Cargar income guardado y configurar listener
-    incomeInput.value = localStorage.getItem('income') || '';
+    // Cargar income específico del usuario y configurar listener
+    incomeInput.value = getUserIncome();
     incomeInput.addEventListener('input', () => {
-      localStorage.setItem('income', incomeInput.value);
+      setUserIncome(incomeInput.value);
       updateBalanceDisplayFromInput();
     });
 
@@ -293,6 +325,8 @@ if (!token) {
     window.initDashboard = async function() {
       try {
         showLoader();
+        // Cargar income del usuario antes de cargar los datos
+        incomeInput.value = getUserIncome();
         await Promise.all([loadTasks(), loadExpenses()]);
         hideLoader();
       } catch (error) {
@@ -305,6 +339,8 @@ if (!token) {
     // Cargar datos iniciales solo si viene de refresh (no de login/register)
     async function initDashboard() {
       try {
+        // Asegurar que el income se carga correctamente al inicializar
+        incomeInput.value = getUserIncome();
         await Promise.all([loadTasks(), loadExpenses()]);
       } catch (error) {
         console.error('❌ Error al cargar datos del usuario:', error);
